@@ -1,2 +1,8 @@
 
 backend/node_modules
+admin-panel/node_modules
+
+backend-backup/node_modules
+backend-backup/middelwares/serviceAccountKey old.json
+backend-backup/middelwares/serviceAccountKey.json
+backend-backup/middelwares/serviceAccountKeyRestos.json
