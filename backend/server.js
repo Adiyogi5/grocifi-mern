@@ -14,7 +14,7 @@ const app = express();
 
 const origin =  process.env.CLIENT_BASEURL ? process.env.CLIENT_BASEURL.split(',') : "*"
 
-
+console.log("origin", origin)
 app.use(cookieParser(process.env.ENCRYPTION_KEY)); 
 app.use(cors({
     origin:origin,

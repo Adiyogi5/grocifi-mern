@@ -62,7 +62,7 @@ function Login() {
                                         var { data } = await AxiosHelper.postData("login", values);
                                         if (data?.status === true) {
                                             toast.success("Successfully Login..!!");
-                                            
+                                            console.log("data.data", data.data)
                                             dispatch(logdedInAdmin(data.data.user))
                                             dispatch(updatePermission(data.data.permissions))
                                             return navigate(`/admin/dashboard`);

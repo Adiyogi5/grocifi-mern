@@ -56,7 +56,7 @@ export default () => {
                             <span className="icon-right" />
                         </button>
                     </div>
-                    <div id="yogastic_main_menu" className={`navbar-collapse ${navClasses}`}>
+                    <div id="yogastic_main_menu" className={` navbar-collapse ${navClasses}`}>
                         <ul id="menu-menu" className="navbar-nav">
                             <Single onClick={closeMenu} label="Home" link="/home" />
                             <Multiple label="Offerings" onSelect={closeMenu} links={[

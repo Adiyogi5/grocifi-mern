@@ -1,0 +1,11 @@
+
+backend/node_modules
+public/uploads 
+public/assets
+db
+.env
+  
+#codeigniter 3
+application/logs/*
+application/session/* 
+application/cache/*

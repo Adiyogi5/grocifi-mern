@@ -1,0 +1,336 @@
+@media only screen and (max-width: 320px) {
+	.logo {
+		max-width: 200px;
+	}
+	.category_card {
+		max-height: 230px;
+	}
+	.category_card img {
+		height: 200px;
+		object-fit: scale-down;
+	}
+	.owl-carousel-category .owl-wrapper-outer {
+		min-height: 275px !important;
+	}
+	.category_card_title {
+		width: 229.551px;
+		height: 44.87px;
+		left: 14%;
+	}
+	.category_card_title p {
+		font-size: 18px;
+		line-height: 45px;
+	}
+	.best_selling_heading {
+		font-size: 18px;
+		line-height: 50px;
+	}
+	.best_sellings_viewall {
+		font-size: 16px;
+	}
+	.vvc_shipping_cms p {
+		font-size: 14px;
+		/* line-height: 40px; */
+	}
+	.vvc_shipping_cms img {
+		margin: 10px 0px;
+	}
+	.product_card {
+		margin: 16px;
+	}
+	.product_card .card-title {
+		font-size: 20px;
+	}
+	.medical_product_available {
+		font-size: 12px;
+	}
+	.product_price {
+		font-size: 25px;
+	}
+}
+@media only screen and (max-width: 425px) and (min-width: 321px) {
+	.logo {
+		max-width: 285px;
+	}
+	.owl-carousel-category .owl-wrapper-outer {
+		min-height: 275px !important;
+	}
+	.category_card {
+		max-height: 230px;
+	}
+	.category_card img {
+		height: 200px;
+		object-fit: scale-down;
+	}
+	.category_card_title {
+		width: 229.551px;
+		height: 44.87px;
+		left: 14%;
+	}
+	.category_card_title p {
+		font-size: 18px;
+		line-height: 45px;
+	}
+	.best_selling_heading {
+		font-size: 18px;
+		line-height: 50px;
+	}
+	.best_sellings_viewall {
+		font-size: 16px;
+	}
+	.vvc_shipping_cms p {
+		font-size: 14px;
+	}
+	.vvc_shipping_cms img {
+		margin: 10px 0px;
+	}
+	.product_card {
+		margin: 16px;
+	}
+	.product_card .card-title {
+		font-size: 20px;
+	}
+	.medical_product_available {
+		font-size: 12px;
+	}
+	.product_price {
+		font-size: 25px;
+	}
+}
+@media only screen and (max-width: 768px) and (min-width: 426px) {
+	.logo {
+		max-width: 220px;
+	}
+	.owl-carousel-category .owl-wrapper-outer {
+		min-height: 275px !important;
+	}
+	.category_card {
+		max-height: 230px;
+	}
+	.category_card_title {
+		width: 229.551px;
+		height: 44.87px;
+		left: 25%;
+	}
+	.category_card_title p {
+		font-size: 18px;
+		line-height: 45px;
+	}
+	.best_selling_heading {
+		font-size: 18px;
+		line-height: 50px;
+	}
+	.best_sellings_viewall {
+		font-size: 16px;
+	}
+	.product_card .card-title {
+		font-size: 22px;
+	}
+	.product_price {
+		font-size: 24px;
+	}
+	.add-to-cart-btn {
+		width: 186px;
+		height: 57px;
+	}
+	.add-to-cart-btn-icon {
+		width: 56px;
+	}
+	.add-to-cart-btn span {
+		font-size: 16px;
+		top: 15px;
+		right: 25px;
+	}
+	.vvc_shipping_cms p {
+		font-size: 18px;
+	}
+	.product_card {
+		margin: 16px;
+	}
+	.product_card .card-title {
+		font-size: 20px;
+	}
+	.medical_product_available {
+		font-size: 12px;
+	}
+	.product_price {
+		font-size: 25px;
+	}
+}
+@media only screen and (max-width: 1024px) and (min-width: 769px) {
+	.logo {
+		max-width: 230px;
+	}
+	.owl-carousel-category .owl-wrapper-outer {
+		min-height: 240px !important;
+	}
+	.category_card {
+		max-height: 191px;
+	}
+	.category_card_title {
+		width: 169.551px;
+		height: 35.87px;
+	}
+	.category_card_title p {
+		font-size: 18px;
+		line-height: 38px;
+	}
+	.best_selling_heading {
+		font-size: 18px;
+		line-height: 50px;
+	}
+	.best_sellings_viewall {
+		font-size: 16px;
+	}
+	.product_card .card-title {
+		font-size: 22px;
+	}
+	.product_price {
+		font-size: 24px;
+	}
+	.add-to-cart-btn {
+		width: 186px;
+		height: 57px;
+	}
+	.add-to-cart-btn-icon {
+		width: 56px;
+	}
+	.add-to-cart-btn span {
+		font-size: 16px;
+		top: 15px;
+		right: 25px;
+	}
+	.vvc_shipping_cms p {
+		font-size: 18px;
+	}
+}
+@media only screen and (max-width: 1200px) and (min-width: 1025px) {
+	.category_card_title {
+		left: 7%;
+	}
+
+	.logo {
+		max-width: 230px;
+	}
+	.owl-carousel-category .owl-wrapper-outer {
+		min-height: 240px !important;
+	}
+	.category_card {
+		max-height: 191px;
+	}
+	.category_card_title {
+		width: 169.551px;
+		height: 35.87px;
+	}
+	.category_card_title p {
+		font-size: 18px;
+		line-height: 38px;
+	}
+	.best_selling_heading {
+		font-size: 18px;
+		line-height: 50px;
+	}
+	.best_sellings_viewall {
+		font-size: 16px;
+	}
+	.product_card .card-title {
+		font-size: 22px;
+	}
+	.product_price {
+		font-size: 24px;
+	}
+	.add-to-cart-btn {
+		width: 186px;
+		height: 57px;
+	}
+	.add-to-cart-btn-icon {
+		width: 56px;
+	}
+	.add-to-cart-btn span {
+		font-size: 16px;
+		top: 15px;
+		right: 25px;
+	}
+	.vvc_shipping_cms p {
+		font-size: 18px;
+	}
+}
+@media only screen and (max-width: 1399px) and (min-width: 1201px) {
+	.container {
+		max-width: 1200px !important;
+	}
+	.logo {
+		max-width: 260px;
+	}
+	.vcc_navbar .navbar-nav li a {
+		font-size: 14px;
+	}
+	.category_card_title {
+		left: 7%;
+	}
+	.product_card .card-title {
+		font-size: 17px;
+	    margin-bottom: 5px !important;
+	    min-height: 45px;
+	    line-height: 23px;
+	}
+	.product_price {
+		font-size: 20px;
+		margin-bottom: 5px !important;
+	}
+	.padbt50 {
+		margin-bottom: 0.5rem;
+	}
+	.add-to-cart-btn {
+		width: 230px;
+		height: 45px;
+	}
+	.add-to-cart-btn-icon {
+		width: 52px;
+	}
+	.add-to-cart-btn span {
+		font-size: 17px;
+		top: 14px;
+		right: 50px;
+	}
+	.vvc_shipping_cms p {
+		font-size: 20.444px;
+	}
+	.home-medical-carousel .item {
+		padding: 11px;
+	}
+	.vcc_vegetable-carousel .item {
+		padding: 11px;
+	}
+}
+@media only screen and (max-width: 1600px) and (min-width: 1400px) {
+	.container {
+		max-width: 1300px !important;
+	}
+	.home-medical-carousel .item {
+		padding: 11px;
+	}
+	.vcc_vegetable-carousel .item {
+		padding: 11px;
+	}
+	.product_card .card-title {
+		font-size: 24px;
+	}
+	.product_price {
+		font-size: 27px;
+	}
+}
+@media only screen and (min-width: 1600px) {
+	.container {
+		max-width: 1400px !important;
+	}
+	.header_location_strip span {
+		font-size: 15px;
+	}
+	.home-medical-carousel .item {
+		padding: 11px;
+	}
+	.vcc_vegetable-carousel .item {
+		padding: 11px;
+	}
+}

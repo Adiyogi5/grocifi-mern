@@ -1,184 +1,111 @@
-import React, { useState, useCallback,useEffect } from 'react'
-import MyForm from '../../../components/MyForm'
-import * as Yup from "yup";
-import { toast } from 'react-toastify';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import MyForm from '../../../components/MyForm';
 import AxiosHelper from '../../../helper/AxiosHelper';
-import { FILE_SIZE,SUPPORTED_FORMATS_IMAGE,STATUS } from '../../../constant/fromConfig';
-import { Link, useNavigate,useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import * as Yup from 'yup';
+import { Link } from 'react-router-dom';
 
+const EditSubadmin = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [roles, setRoles] = useState([]);
+  const [initialValues, setInitialValues] = useState({
+    fname: '',
+    lname: '',
+    email: '',
+    phone_no: '',
+    roleId: roles[0]?.id,
+    image: '',
+  });
 
-const editSubadmin = () => {
-    const navigate = useNavigate()
-    const [errors, setErrors] = useState({ name: '', status: '' })
-    const [roleData, setroleData] = useState([]);
-    const { id } = useParams();
-  
-     const [initialValues, setInitialValues] = useState({
-            name:"",
-            firstName: "",
-            lastName: "",
-            email: "",
-            roleId: "",
-            mobile: "",
-            image:"",
-            password:"",
-            status: 1,
-        });
+  console.log("roles", roles[0]?.id)
+  const validationSchema = Yup.object().shape({
+    fname: Yup.string().required('First Name is required'),
+    lname: Yup.string().required('Last Name is required'),
+    email: Yup.string().email('Valid Email is required').required('Email is required'),
+    phone_no: Yup.string().matches(/^[0-9]{10}$/, 'Phone Number must be 10 digits').required('Phone Number is required'),
+    roleId: Yup.string().required('Role is required'),
+  });
 
-
-    const validationSchema = Yup.object().shape({
-        firstName: Yup.string().required('Name is required').min(2, 'First Name must be at least 2 characters').max(50, 'Name must be less than 50 characters'),
-        image: Yup.mixed()
-            .test("fileSize", "File too large", (value) => {
-                if (value && (typeof value) !== 'string') return value.size <= FILE_SIZE;
-                return true;
-            }),
-        mobile: Yup.string().min(10, 'Mobile Number must be 10 characters').max(10, 'Mobile Number must be 10 characters').required('Mobile is required'), 
-        roleId: Yup.string().required('Role is required'), 
-        email: Yup.string().email().required('Email is required'), 
-        // status: Yup.boolean().required('Status is required'),
-    });
-
-    const fetchUserData = useCallback(async () => {
-        try {
-            const { data } = await AxiosHelper.getData(`subadmin/${id}`);
-
-            if (data?.status === true) {
-                let response  = data.data
-               
-                setInitialValues({
-                    id: response._id || '',
-                    firstName: response?.firstName||"",
-                    lastName: response?.lastName||"",
-                    email: response.email,
-                    roleId: response.roleId,
-                    mobile: response.mobile,
-                    image:response.image,
-                    password:"",
-                    status: response.status,
-                })
-                
-                // setInitialValues(data?.data);
-            } else {
-                toast.error(data?.message);
-                navigate('/admin/subadmin');
-            }
-        } catch (error) {
-            console.error("Error fetching User data:", error);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data } = await AxiosHelper.getData(`subadmin/edit/${id}`);
+        if (data.status) {
+          setRoles(data.data.roles.map((role) => ({ id: role._id, name: role.name })));
+          setInitialValues(data.data.user);
+        } else {
+          toast.error(data.message);
         }
-    }, [id, navigate]);
-   
-    const getRoleData = useCallback(async () => {
-        const { data } = await AxiosHelper.getData("role");
-        if (data?.status === true) {
-            setroleData(data?.data);
-        }
-    }, []);
+      } catch (error) {
+        toast.error('Failed to fetch data');
+      }
+    };
+    fetchData();
+  }, [id]);
 
-    
-    useEffect(() => { getRoleData() }, [])
-    useEffect(() => {
-        fetchUserData();
-        }, [fetchUserData]);
-   
-    const fields = [
-        {
-            label: "First Name",
-            name: "firstName",
-            type: "text",
-            col: 6
-        },
-        {
-            label: "Last Name",
-            name: "lastName",
-            type: "text",
-            col: 6
-        },
-        {
-            label: "Email",
-            name: "email",
-            type: "text",
-            col: 6
-        },
-        {
-            label: "Mobile",
-            name: "mobile",
-            type: "text",
-            col: 6
-        },
-        
-        {
-            label: "Role",
-            name: "roleId",
-            type: "select2",
-            options:roleData,
-            col: 6
-        },
-        {
-            label: "Status",
-            name: "status",
-            type: "select2",
-            options: STATUS,
-            col: 6
-        },
-        {
-            label: "Password",
-            name: "password",
-            type: "text",
-            col: 6
-        },
-        {
-            label: "Profile Image",
-            name: "image",
-            type: "file",
-            col: 6
-        },
-        {
-            label: "Submit",
-            name: "submit",
-            type: "submit",
+  const handleSubmit = async (values) => {
+    try {
+      const formData = new FormData();
+      Object.keys(values).forEach((key) => {
+        if (key === 'image' && values[key] instanceof File) {
+          formData.append(key, values[key]);
+        } else {
+          formData.append(key, values[key]);
         }
-    ];
+      });
+      formData.append('roleId', values?.roleId?.id); 
+      const { data } = await AxiosHelper.postData(`subadmin/edit/${id}`, formData, true);
+      if (data.status) {
+        toast.success(data.message);
+        navigate('/admin/subadmin');
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error('Failed to submit form');
+    }
+  };
 
-    return (
-        <div>
-            <div className="row">
-                <div className="col-md-12">
-                    <div className="card mb-3">
-                        <div className="card-header">
-                            <div className="row flex-between-end">
-                                <div className="col-auto align-self-center">
-                                    <h5 className="mb-0" data-anchor="data-anchor">Edit Sub-Admin</h5>
-                                </div>
-                                <div className="col-auto ms-auto">
-                                    <Link to={`/admin/subadmin`}>
-                                        <button className="btn btn-sm btn-falcon-default">
-                                            <i className="fa fa-arrow-left me-2"></i>
-                                            Go Back
-                                        </button>
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='card-body'>
-                            <MyForm errors={errors} fields={fields} initialValues={initialValues} validSchema={validationSchema} onSubmit={async (values) => {
-                            
-                                // data = await AxiosHelper.putData(`user/edit/${values.id}`, values, true);
-                                const data = await AxiosHelper.putData(`subadmin/edit/${values.id}`, values,true);
-                                if (data?.data?.status === true) {
-                                    toast.success(data?.data?.message);
-                                    navigate('/admin/subadmin')
-                                } else {
-                                    setErrors(data?.data?.data)
-                                    toast.error(data?.data?.message);
-                                }
-                            }} />
-                        </div>
-                    </div>
-                </div>
+  const fields = [
+    { name: 'fname', label: 'First Name', type: 'text', col: 6 },
+    { name: 'lname', label: 'Last Name', type: 'text', col: 6 },
+    { name: 'email', label: 'Email', type: 'email', col: 6 },
+    { name: 'phone_no', label: 'Phone Number', type: 'text', col: 6 },
+    { name: 'roleId', label: 'Role', type: 'select', options: roles, col: 6 },
+    { name: 'image', label: 'Profile Image', type: 'file', col: 6 },
+    { name: 'submit', label: 'Update', type: 'submit', col: 12 },
+  ];
+
+  return (
+    <div className="row">
+      <div className="col-md-12">
+        <div className="card mb-3">
+          <div className="card-header">
+            <div className="row flex-between-end">
+              <div className="col-auto align-self-center">
+                <h5 className="mb-0">Edit Subadmin</h5>
+              </div>
+              <div className="col-auto ms-auto">
+                <Link to="/admin/subadmin" className="btn btn-sm btn-falcon-default">
+                  <i className="fa fa-arrow-left me-1"></i> Back
+                </Link>
+              </div>
             </div>
+          </div>
+          <div className="card-body">
+            <MyForm
+              initialValues={initialValues}
+              validationSchema={validationSchema}
+              onSubmit={handleSubmit}
+              fields={fields}
+            />
+          </div>
         </div>
-    )
-}
+      </div>
+    </div>
+  );
+};
 
-export default editSubadmin
+export default EditSubadmin;

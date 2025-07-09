@@ -1,4 +1,6 @@
 const CryptoJS = require("crypto-js");
+const { v4: uuidv4 } = require('uuid');
+const { User } = require("../models");
 
 exports.encrypt = (plainText, secret) => {
     try {
@@ -33,4 +35,16 @@ exports.decrypt = (encryptedText, workingKey) => {
         return null;
     }
 
+};
+exports.generateUniqueReferCode = async () => {
+  let referCode;
+  let isUnique = false;
+  while (!isUnique) {
+    referCode = uuidv4().substring(0, 8).toUpperCase(); // Generate 8-character code
+    const existingUser = await User.findOne({ refer_code: referCode });
+    if (!existingUser) {
+      isUnique = true;
+    }
+  }
+  return referCode;
 };

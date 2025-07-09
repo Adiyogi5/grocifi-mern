@@ -1,0 +1,14 @@
+FTP Client- 
+host - 103.69.196.24
+user - grofici
+pass - iDsa!6473
+
+FTP Server - 
+host - 103.69.196.24
+user - grofici-server
+pass - iDsa!6473
+
+DATABASE URI - mongodb://localhost:27017/groficiDB
+
+https://technolite.in/demo/grofici/
+https://grofici.adiyogitechnology.com/

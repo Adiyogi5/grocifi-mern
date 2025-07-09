@@ -6,7 +6,7 @@ const commonHeadres = () => {
     axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
     axios.defaults.headers.common['x-api-key'] = import.meta.env.VITE_LICENCE;
     // axios.defaults.crossDomain = true
-    // axios.defaults.withCredentials = true
+    axios.defaults.withCredentials = true
 }
 
 const CheckError = (res) => {

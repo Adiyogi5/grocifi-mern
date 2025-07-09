@@ -19,6 +19,8 @@ const MyForm = ({
 }) => {
   const [inactive, setInActive] = useState(false);
   const [showTable, setShowTable] = useState(false);
+
+  console.log("initialValues", initialValues)
   return (
     <Formik
       initialValues={initialValues}
@@ -523,7 +525,7 @@ const PictureInput = ({ form, field, multiple, label, disabled }) => {
         )}
 
       </div>
-      {previews.length > 0 && (
+      {previews.length > 0 ? (
         <div className="mt-2">
           {previews.map((src, index) => (
             <img
@@ -531,9 +533,20 @@ const PictureInput = ({ form, field, multiple, label, disabled }) => {
               src={src}
               alt={`Preview ${index}`}
               className="img-thumbnail me-2"
-              style={{ width: "80px", height: "80px" }}
+              style={{ width: "100px", height: "100px", objectFit: "contain" }}
             />
           ))}
+        </div>
+      ) : (
+        <div className="mt-2">
+          {![undefined, null, ""].includes(url) && (
+             <img
+              src={url}
+              alt={`Preview Image`}
+              className="img-thumbnail me-2"
+              style={{ width: "100px", height: "100px", objectFit: "contain" }}
+            />
+          )}
         </div>
       )}
     </>
