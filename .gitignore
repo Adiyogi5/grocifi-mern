@@ -6,3 +6,6 @@ backend-backup/node_modules
 backend-backup/middelwares/serviceAccountKey old.json
 backend-backup/middelwares/serviceAccountKey.json
 backend-backup/middelwares/serviceAccountKeyRestos.json
+grocifi-main/backend/middelwares/serviceAccountKey old.json
+grocifi-main/backend/middelwares/serviceAccountKey.json
+grocifi-main/backend/middelwares/serviceAccountKeyRestos.json
