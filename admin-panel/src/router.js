@@ -127,28 +127,7 @@ const routes = [
           return { Component: routePermission(module.default, "Customer", "edit") };
         },
       },
-      // --------- Wholesaler Route ----------
-      {
-        path: "wholesaler",
-        lazy: async () => {
-          let module = await import("./routes/admin/wholesaler/ListWholesaler");
-          return { Component: routePermission(module.default, "Wholesaler") };
-        },
-      },
-      {
-        path: "wholesaler/add",
-        lazy: async () => {
-          let module = await import("./routes/admin/wholesaler/AddWholesaler");
-          return { Component: routePermission(module.default, "Wholesaler", "add") };
-        },
-      },
-      {
-        path: "wholesaler/edit/:id",
-        lazy: async () => {
-          let module = await import("./routes/admin/wholesaler/EditWholesaler");
-          return { Component: routePermission(module.default, "Wholesaler", "edit") };
-        },
-      },
+      
       // --------- Delivery Boy Route ----------
       {
         path: "delivery-boys",

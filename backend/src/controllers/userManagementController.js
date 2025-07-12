@@ -48,7 +48,7 @@ module.exports = {
 
   addSubAdmin: async (req, res) => {
     try {
-        const referCode = await generateUniqueReferCode();
+      const referCode = await generateUniqueReferCode();
       const { fname, lname, email, phone_no, password, roleId } = req.body;
       const existingUser = await User.findOne({
         $or: [{ email }, { phone_no }],
@@ -66,8 +66,10 @@ module.exports = {
         phone_no,
         password: await bcrypt.hash(password, 10),
         roleId,
-        img: req.file ? process.env.FILEURL + "profile/" + req.file.filename : "noimage.png",
-         refer_code: referCode, 
+        img: req.file
+          ? process.env.FILEURL + "profile/" + req.file.filename
+          : "noimage.png",
+        refer_code: referCode,
         createdby: req.admin._id,
         modifiedby: req.admin._id,
       });
@@ -118,7 +120,7 @@ module.exports = {
       );
       return res.successUpdate(updatedUser);
     } catch (error) {
-      console.log("error", error)
+      console.log("error", error);
       return res.someThingWentWrong(error);
     }
   },
@@ -168,7 +170,7 @@ module.exports = {
   },
 
   addFranchise: async (req, res) => {
-        const referCode = await generateUniqueReferCode();
+    const referCode = await generateUniqueReferCode();
 
     try {
       const {
@@ -216,7 +218,7 @@ module.exports = {
         img: req.files["image"]
           ? process.env.FILEURL + "profile/" + req.files["image"][0].filename
           : "noimage.png",
-          refer_code: referCode,
+        refer_code: referCode,
         createdby: req.admin._id,
         modifiedby: req.admin._id,
       });
@@ -238,7 +240,9 @@ module.exports = {
         accept_minimum_order: accept_minimum_order === "true",
         delivery_day_after_order: parseInt(delivery_day_after_order),
         delivery_max_day: parseInt(delivery_max_day),
-        logo: req.files["logo"] ? process.env.FILEURL + "franchise/" + req.files["logo"][0].filename : null,
+        logo: req.files["logo"]
+          ? process.env.FILEURL + "franchise/" + req.files["logo"][0].filename
+          : null,
         createdby: req.admin._id,
         modifiedby: req.admin._id,
       });
@@ -264,7 +268,7 @@ module.exports = {
   },
 
   updateFranchise: async (req, res) => {
-        const referCode = await generateUniqueReferCode();
+    const referCode = await generateUniqueReferCode();
     try {
       const {
         fname,
@@ -310,7 +314,8 @@ module.exports = {
         modifiedby: req.admin._id,
       };
       if (req.files["image"]) {
-        updateUserData.img = process.env.FILEURL + "profile/" + req.files["image"][0].filename;
+        updateUserData.img =
+          process.env.FILEURL + "profile/" + req.files["image"][0].filename;
       }
       await User.findByIdAndUpdate(user._id, { $set: updateUserData });
       const updateFranchiseData = {
@@ -333,7 +338,8 @@ module.exports = {
         modifiedby: req.admin._id,
       };
       if (req.files["logo"]) {
-        updateFranchiseData.logo = process.env.FILEURL + "franchise/" + req.files["logo"][0].filename;
+        updateFranchiseData.logo =
+          process.env.FILEURL + "franchise/" + req.files["logo"][0].filename;
       }
       const updatedFranchise = await Franchise.findByIdAndUpdate(
         createFromHexString(req.params.id),
@@ -355,6 +361,7 @@ module.exports = {
       if (!role) {
         return res.noRecords();
       }
+
       const conditions = { roleId: role._id, deletedAt: null };
       if (query) {
         conditions.$or = [
@@ -362,13 +369,17 @@ module.exports = {
           { lname: { $regex: query, $options: "i" } },
           { email: { $regex: query, $options: "i" } },
           { phone_no: { $regex: query, $options: "i" } },
+          { wholesaler_firmname: { $regex: query, $options: "i" } },
+          { gst_no: { $regex: query, $options: "i" } },
         ];
       }
+
       const records = await User.find(conditions)
         .populate("roleId")
         .sort({ [orderBy]: orderDirection === -1 ? -1 : 1 })
         .skip((pageNo - 1) * limit)
         .limit(parseInt(limit));
+
       const total = await User.countDocuments(conditions);
       return res.pagination(records, total, parseInt(limit), parseInt(pageNo));
     } catch (error) {
@@ -387,9 +398,221 @@ module.exports = {
 
   addCustomer: async (req, res) => {
     try {
-              const referCode = await generateUniqueReferCode();
+      const referCode = await generateUniqueReferCode();
+      const {
+        fname,
+        lname,
+        email,
+        phone_no,
+        password,
+        wholesaler_firmname,
+        gst_no,
+        is_wholesaler,
+        image
+      } = req.body;
 
-      const { fname, lname, email, phone_no, password } = req.body;
+      console.log("req.body>>", is_wholesaler == true);
+      console.log("req.body>", is_wholesaler == "true");
+
+      const existingUser = await User.findOne({
+        $or: [{ email }, { phone_no }],
+        deletedAt: null,
+      });
+      if (existingUser) {
+        return res.badRequest(
+          "User with this email or phone number already exists"
+        );
+      }
+
+      const role = await Role.findOne({ name: "Customer", deletedAt: null });
+      if (!role) {
+        return res.badRequest("Role not found");
+      }
+
+      const user = new User({
+        fname,
+        lname,
+        email,
+        phone_no,
+        password: await bcrypt.hash(password, 10),
+        roleId: role._id,
+        img: req.files?.image
+          ? process.env.FILEURL + "profile/" + req.files.image[0].filename
+          : image || "noimage.png",
+        refer_code: referCode,
+        createdby: req.admin._id,
+        modifiedby: req.admin._id,
+        is_wholesaler: is_wholesaler == "true",
+        ...(is_wholesaler == "true" && {
+          wholesaler_firmname,
+          gst_no,
+          visiting_card: req.files?.visiting_card
+            ? process.env.FILEURL +
+              "visiting_card/" +
+              req.files.visiting_card[0].filename
+            : null,
+        }),
+      });
+
+      await user.save();
+      return res.successInsert(user);
+    } catch (error) {
+      return res.someThingWentWrong(error);
+    }
+  },
+
+  getEditCustomer: async (req, res) => {
+    try {
+      const user = await User.findById(
+        createFromHexString(req.params.id)
+      ).populate("roleId");
+
+      if (!user || user.deletedAt) {
+        return res.noRecords();
+      }
+
+      const roles = await Role.find({ name: "Customer", deletedAt: null });
+      return res.success({ user, roles });
+    } catch (error) {
+      return res.someThingWentWrong(error);
+    }
+  },
+
+  updateCustomer: async (req, res) => {
+    try {
+      const {
+        fname,
+        lname,
+        email,
+        phone_no,
+        roleId,
+        wholesaler_firmname,
+        gst_no,
+        is_wholesaler,
+        image
+      } = req.body;
+
+      console.log("req.body", req.body);
+      console.log("req.body>>", is_wholesaler == true);
+      console.log("req.body>", is_wholesaler == "true");
+
+      const user = await User.findById(createFromHexString(req.params.id));
+      if (!user || user.deletedAt) {
+        return res.noRecords();
+      }
+
+      const updateData = {
+        fname,
+        lname,
+        email,
+        phone_no,
+        roleId,
+         img: req.files?.image
+          ? process.env.FILEURL + "profile/" + req.files.image[0].filename
+          : image || "noimage.png",
+        modified: new Date(),
+        modifiedby: req.admin._id,
+        is_wholesaler: is_wholesaler == "true",
+        ...(is_wholesaler == "true" && {
+          wholesaler_firmname,
+          gst_no,
+          visiting_card: req.files?.visiting_card
+            ? process.env.FILEURL +
+              "visiting_card/" +
+              req.files.visiting_card[0].filename
+            : user.visiting_card,
+        }),
+      };
+      console.log("req.files", req.files);
+      console.log("updateData", updateData);
+      console.log("updateData.img", updateData.img);
+
+      // If switching from wholesaler to customer, clear wholesaler fields
+      if (user.is_wholesaler && is_wholesaler === "false") {
+        updateData.wholesaler_firmname = null;
+        updateData.gst_no = null;
+        updateData.visiting_card = null;
+      }
+
+      const updatedUser = await User.findByIdAndUpdate(
+        createFromHexString(req.params.id),
+        { $set: updateData },
+        { new: true }
+      );
+
+      return res.successUpdate(updatedUser);
+    } catch (error) {
+      return res.someThingWentWrong(error);
+    }
+  },
+
+  listWholesalers: async (req, res) => {
+    try {
+      const { limit, pageNo, query, orderBy, orderDirection } = req.query;
+      const role = await Role.findOne({ name: "Customer" });
+      if (!role) {
+        return res.noRecords("Customer role not found");
+      }
+      const conditions = {
+        roleId: role._id,
+        deletedAt: null,
+      };
+      if (query) {
+        conditions.$or = [
+          { fname: { $regex: query, $options: "i" } },
+          { lname: { $regex: query, $options: "i" } },
+          { email: { $regex: query, $options: "i" } },
+          { phone_no: { $regex: query, $options: "i" } },
+          { wholesaler_firmname: { $regex: query, $options: "i" } },
+          { gst_no: { $regex: query, $options: "i" } },
+        ];
+      }
+      const agg = new AggregationService(User)
+        .match(conditions)
+        .lookup([
+          {
+            from: "roles",
+            localField: "roleId",
+            foreignField: "_id",
+            as: "roleId",
+          },
+        ])
+        .unwind(["$roleId"])
+        .sort(orderBy, orderDirection === "-1" ? "desc" : "asc")
+        .facet()
+        .paginate((pageNo - 1) * limit, parseInt(limit));
+      const result = await agg.execute();
+      const records = result[0]?.records || [];
+      const total = result[0]?.total?.[0]?.count || 0;
+      return res.pagination(records, total, parseInt(limit), parseInt(pageNo));
+    } catch (error) {
+      return res.someThingWentWrong(error);
+    }
+  },
+
+  // Get data for add wholesaler
+  getAddWholesaler: async (req, res) => {
+    try {
+      const roles = await Role.find({ name: "Customer", deletedAt: null });
+      return res.success(roles);
+    } catch (error) {
+      return res.someThingWentWrong(error);
+    }
+  },
+
+  // Add wholesaler
+  addWholesaler: async (req, res) => {
+    try {
+      const referCode = await generateUniqueReferCode();
+      const {
+        fname,
+        lname,
+        email,
+        phone_no,
+        password,
+        wholesaler_firmname,
+        gst_no,
+      } = req.body;
       const existingUser = await User.findOne({
         $or: [{ email }, { phone_no }],
         deletedAt: null,
@@ -410,7 +633,16 @@ module.exports = {
         phone_no,
         password: await bcrypt.hash(password, 10),
         roleId: role._id,
-        img: req.file ? process.env.FILEURL + "profile/" + req.file.filename : "noimage.png",
+        wholesaler_firmname,
+        gst_no,
+        img: req.files?.img
+          ? process.env.FILEURL + "profile/" + req.files.img[0].filename
+          : "noimage.png",
+        visiting_card: req.files?.visiting_card
+          ? process.env.FILEURL +
+            "visiting_card/" +
+            req.files.visiting_card[0].filename
+          : null,
         refer_code: referCode,
         createdby: req.admin._id,
         modifiedby: req.admin._id,
@@ -422,7 +654,8 @@ module.exports = {
     }
   },
 
-  getEditCustomer: async (req, res) => {
+  // Get data for edit wholesaler
+  getEditWholesaler: async (req, res) => {
     try {
       const user = await User.findById(
         createFromHexString(req.params.id)
@@ -437,9 +670,11 @@ module.exports = {
     }
   },
 
-  updateCustomer: async (req, res) => {
+  // Update wholesaler
+  updateWholesaler: async (req, res) => {
     try {
-      const { fname, lname, email, phone_no } = req.body;
+      const { fname, lname, email, phone_no, wholesaler_firmname, gst_no } =
+        req.body;
       const user = await User.findById(createFromHexString(req.params.id));
       if (!user || user.deletedAt) {
         return res.noRecords();
@@ -449,11 +684,20 @@ module.exports = {
         lname,
         email,
         phone_no,
+        wholesaler_firmname,
+        gst_no,
         modified: new Date(),
         modifiedby: req.admin._id,
       };
-      if (req.file) {
-        updateData.img = process.env.FILEURL + "profile/" + req.file.filename;
+      if (req.files?.img) {
+        updateData.img =
+          process.env.FILEURL + "profile/" + req.files.img[0].filename;
+      }
+      if (req.files?.visiting_card) {
+        updateData.visiting_card =
+          process.env.FILEURL +
+          "visiting_card/" +
+          req.files.visiting_card[0].filename;
       }
       const updatedUser = await User.findByIdAndUpdate(
         createFromHexString(req.params.id),
@@ -466,158 +710,15 @@ module.exports = {
     }
   },
 
-listWholesalers: async (req, res) => {
+  // View wholesaler
+  viewWholesaler: async (req, res) => {
     try {
-        const { limit, pageNo, query, orderBy, orderDirection } = req.query;
-        const role = await Role.findOne({ name: "Customer" });
-        if (!role) {
-            return res.noRecords('Customer role not found');
-        }
-        const conditions = {
-            roleId: role._id,
-            deletedAt: null,
-        };
-        if (query) {
-            conditions.$or = [
-                { fname: { $regex: query, $options: "i" } },
-                { lname: { $regex: query, $options: "i" } },
-                { email: { $regex: query, $options: "i" } },
-                { phone_no: { $regex: query, $options: "i" } },
-                { wholesaler_firmname: { $regex: query, $options: "i" } },
-                { gst_no: { $regex: query, $options: "i" } }
-            ];
-        }
-        const agg = new AggregationService(User)
-            .match(conditions)
-            .lookup([
-                {
-                    from: "roles",
-                    localField: "roleId",
-                    foreignField: "_id",
-                    as: "roleId",
-                },
-            ])
-            .unwind(["$roleId"])
-            .sort(orderBy, orderDirection === '-1' ? "desc" : "asc")
-            .facet()
-            .paginate((pageNo - 1) * limit, parseInt(limit));
-        const result = await agg.execute();
-        const records = result[0]?.records || [];
-        const total = result[0]?.total?.[0]?.count || 0;
-        return res.pagination(records, total, parseInt(limit), parseInt(pageNo));
+      const roles = await Role.find({ name: "Customer", deletedAt: null });
+      return res.success(roles);
     } catch (error) {
-        return res.someThingWentWrong(error);
+      return res.someThingWentWrong(error);
     }
-},
-
-// Get data for add wholesaler
-getAddWholesaler: async (req, res) => {
-    try {
-        const roles = await Role.find({ name: "Customer", deletedAt: null });
-        return res.success(roles);
-    } catch (error) {
-        return res.someThingWentWrong(error);
-    }
-},
-
-// Add wholesaler
-addWholesaler: async (req, res) => {
-    try {
-        const referCode = await generateUniqueReferCode();
-        const { fname, lname, email, phone_no, password, wholesaler_firmname, gst_no } = req.body;
-        const existingUser = await User.findOne({
-            $or: [{ email }, { phone_no }],
-            deletedAt: null,
-        });
-        if (existingUser) {
-            return res.badRequest("User with this email or phone number already exists");
-        }
-        const role = await Role.findOne({ name: "Customer" });
-        if (!role) {
-            return res.badRequest("Customer role not found");
-        }
-        const user = new User({
-            fname,
-            lname,
-            email,
-            phone_no,
-            password: await bcrypt.hash(password, 10),
-            roleId: role._id,
-            wholesaler_firmname,
-            gst_no,
-            img: req.files?.img ? process.env.FILEURL + "profile/" + req.files.img[0].filename : "noimage.png",
-            visiting_card: req.files?.visiting_card ? process.env.FILEURL + "visiting_card/" + req.files.visiting_card[0].filename : null,
-            refer_code: referCode,
-            createdby: req.admin._id,
-            modifiedby: req.admin._id,
-        });
-        await user.save();
-        return res.successInsert(user);
-    } catch (error) {
-        return res.someThingWentWrong(error);
-    }
-},
-
-// Get data for edit wholesaler
-getEditWholesaler: async (req, res) => {
-  try {
-    const user = await User.findById(
-      createFromHexString(req.params.id)
-    ).populate("roleId");
-    if (!user || user.deletedAt) {
-      return res.noRecords();
-    }
-    const roles = await Role.find({ name: "Customer", deletedAt: null });
-    return res.success({ user, roles });
-  } catch (error) {
-    return res.someThingWentWrong(error);
-  }
-},
-
-// Update wholesaler
-updateWholesaler: async (req, res) => {
-    try {
-        const { fname, lname, email, phone_no, wholesaler_firmname, gst_no } = req.body;
-        const user = await User.findById(createFromHexString(req.params.id));
-        if (!user || user.deletedAt) {
-            return res.noRecords();
-        }
-        const updateData = {
-            fname,
-            lname,
-            email,
-            phone_no,
-            wholesaler_firmname,
-            gst_no,
-            modified: new Date(),
-            modifiedby: req.admin._id,
-        };
-        if (req.files?.img) {
-            updateData.img = process.env.FILEURL + "profile/" + req.files.img[0].filename;
-        }
-        if (req.files?.visiting_card) {
-            updateData.visiting_card = process.env.FILEURL + "visiting_card/" + req.files.visiting_card[0].filename;
-        }
-        const updatedUser = await User.findByIdAndUpdate(
-            createFromHexString(req.params.id),
-            { $set: updateData },
-            { new: true }
-        );
-        return res.successUpdate(updatedUser);
-    } catch (error) {
-        return res.someThingWentWrong(error);
-    }
-},
-
-// View wholesaler
-viewWholesaler: async (req, res) => {
-  try {
-    const roles = await Role.find({ name: "Customer", deletedAt: null });
-    return res.success(roles);
-  } catch (error) {
-    return res.someThingWentWrong(error);
-  }
-},
+  },
   // Delivery Boy Management
   listDeliveryBoys: async (req, res) => {
     try {
@@ -680,7 +781,9 @@ viewWholesaler: async (req, res) => {
         phone_no,
         password: await bcrypt.hash(password, 10),
         roleId: role._id,
-        img: req.file ? process.env.FILEURL + "profile/" + req.file.filename : "noimage.png",
+        img: req.file
+          ? process.env.FILEURL + "profile/" + req.file.filename
+          : "noimage.png",
         refer_code: referCode,
         createdby: req.admin._id,
         modifiedby: req.admin._id,

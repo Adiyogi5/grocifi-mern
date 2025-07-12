@@ -32,10 +32,6 @@ export default [
         url: `/admin/customer`,
       },
       {
-        name: "Wholesaler",
-        url: `/admin/wholesaler`,
-      },
-      {
         name: "Delivery Boys",
         url: `/admin/delivery-boys`,
       },

@@ -10,6 +10,7 @@ import withReactContent from 'sweetalert2-react-content';
 import PermissionBlock from '../../../components/PermissionBlock';
 import useRowSelection from '../../../helper/helperFunctions';
 import { toast } from 'react-toastify';
+import { FaUser, FaStore } from 'react-icons/fa';
 
 const MySwal = withReactContent(Swal);
 
@@ -17,7 +18,13 @@ const ListCustomer = () => {
   const navigate = useNavigate();
   const [data, setData] = useState({ count: 0, record: [], totalPages: 0, pagination: [] });
   const [showView, setShowView] = useState(false);
-  const [param, setParam] = useState({ limit: 10, pageNo: 1, query: '', orderBy: 'created', orderDirection: -1 });
+  const [param, setParam] = useState({ 
+    limit: 10, 
+    pageNo: 1, 
+    query: '', 
+    orderBy: 'created', 
+    orderDirection: -1
+  });
   const [initialValues, setInitialValues] = useState({
     fname: '',
     lname: '',
@@ -27,6 +34,10 @@ const ListCustomer = () => {
     image: '',
     status: 1,
     created: '',
+    wholesaler_firmname: '',
+    gst_no: '',
+    visiting_card: '',
+    is_wholesaler: false
   });
 
   const getDataForTable = useCallback(async () => {
@@ -63,8 +74,8 @@ const ListCustomer = () => {
   const deleteData = async (event) => {
     const { isConfirmed } = await MySwal.fire(getDeleteConfig({}));
     if (isConfirmed) {
-      const { id } = JSON.parse(event.target.attributes.getNamedItem('main-data').value);
-      const { data } = await AxiosHelper.deleteData(`customer/delete/${id}`);
+      const { _id } = JSON.parse(event.target.attributes.getNamedItem('main-data').value);
+      const { data } = await AxiosHelper.deleteData(`customer/delete/${_id}`);
       if (data?.status === true) {
         getDataForTable();
         toast.success(data?.message);
@@ -109,6 +120,28 @@ const ListCustomer = () => {
     getDataForTable,
   });
 
+  const renderUserTypeIcon = (isWholesaler) => {
+    return isWholesaler ? (
+      <span className="badge bg-success me-2" title="Wholesaler">
+        <FaStore className="me-1" /> Wholesaler
+      </span>
+    ) : (
+      <span className="badge bg-primary me-2" title="Customer">
+        <FaUser className="me-1" /> Customer
+      </span>
+    );
+  };
+
+  const renderWholesalerField = (value, isWholesaler) => {
+    return isWholesaler ? (
+      value || '-'
+    ) : (
+      <span className="text-muted" title="Not applicable for customer">
+        <i className="fas fa-minus"></i>
+      </span>
+    );
+  };
+
   return (
     <div>
       <div className="row">
@@ -118,7 +151,7 @@ const ListCustomer = () => {
               <div className="row flex-between-end">
                 <div className="col-auto align-self-center">
                   <h5 className="mb-0" data-anchor="data-anchor">
-                    Customer
+                    Customer Management
                   </h5>
                 </div>
                 <div className="col-auto ms-auto">
@@ -175,7 +208,7 @@ const ListCustomer = () => {
               </div>
               <div className="tab-content">
                 <div id="tableExample2" data-list="">
-                  <div className="table-responsive1">
+                  <div className="table-responsive">
                     <table className="table table-bordered table-striped fs--1 mb-0">
                       <thead className="bg-200 text-900">
                         <tr>
@@ -186,6 +219,7 @@ const ListCustomer = () => {
                               onChange={() => toggleSelectAll(data.record)}
                             />
                           </th>
+                          <th>Type</th>
                           <th>Profile</th>
                           <th
                             onClick={handleSort}
@@ -196,10 +230,17 @@ const ListCustomer = () => {
                           </th>
                           <th
                             onClick={handleSort}
-                            className={`sort ${param?.orderBy === 'roleId.name' && (param?.orderDirection === 1 ? 'asc' : 'desc')}`}
-                            data-sort="roleId.name"
+                            className={`sort ${param?.orderBy === 'wholesaler_firmname' && (param?.orderDirection === 1 ? 'asc' : 'desc')}`}
+                            data-sort="wholesaler_firmname"
                           >
-                            Role
+                            Firm Name
+                          </th>
+                          <th
+                            onClick={handleSort}
+                            className={`sort ${param?.orderBy === 'gst_no' && (param?.orderDirection === 1 ? 'asc' : 'desc')}`}
+                            data-sort="gst_no"
+                          >
+                            GST No.
                           </th>
                           <th
                             onClick={handleSort}
@@ -237,7 +278,17 @@ const ListCustomer = () => {
                               />
                             </td>
                             <td>
-                              <img src={row.img} alt="" width={100} />
+                              {renderUserTypeIcon(row.is_wholesaler)}
+                            </td>
+                            <td>
+                              <img 
+                                src={row?.img || '/assets/img/team/avatar.png'} 
+                                alt="" 
+                                width={50} 
+                                style={{objectFit: 'contain'}}
+                                height={50}
+                                className="rounded-circle"
+                              />
                             </td>
                             <td
                               className="fw-bold text-primary cursor-pointer"
@@ -246,7 +297,12 @@ const ListCustomer = () => {
                             >
                               {row.fname + ' ' + row.lname}
                             </td>
-                            <td>{row.roleId?.name}</td>
+                            <td>
+                              {renderWholesalerField(row.wholesaler_firmname, row.is_wholesaler)}
+                            </td>
+                            <td>
+                              {renderWholesalerField(row.gst_no, row.is_wholesaler)}
+                            </td>
                             <td>{row.email}</td>
                             <td>{row.phone_no}</td>
                             <td>{formatDateDDMMYYYY(row.created)}</td>
@@ -260,7 +316,7 @@ const ListCustomer = () => {
                         ))}
                         {data?.record.length === 0 && (
                           <tr>
-                            <td colSpan="100" className="text-danger text-center">
+                            <td colSpan="12" className="text-danger text-center">
                               No data available.
                             </td>
                           </tr>
@@ -324,18 +380,55 @@ const ListCustomer = () => {
         aria-labelledby="example-modal-sizes-title-lg"
       >
         <Modal.Header>
-          <Modal.Title id="example-modal-sizes-title-lg">View Customer</Modal.Title>
+          <Modal.Title id="example-modal-sizes-title-lg">
+            View {initialValues.is_wholesaler ? 'Wholesaler' : 'Customer'} Details
+          </Modal.Title>
           <CloseButton onClick={() => setShowView(false)} />
         </Modal.Header>
         <Modal.Body>
           <ul className="list-group">
             <li className="list-group-item text-center">
-              <img src={initialValues.img} alt="Thumbnail" className="img-fluid" width={250} />
+              <img 
+                src={initialValues.img || '/assets/img/team/avatar.png'} 
+                alt="Profile" 
+                className="img-fluid rounded-circle" 
+                width={150} 
+                height={150}
+              />
+            </li>
+            {initialValues.is_wholesaler && initialValues.visiting_card && (
+              <li className="list-group-item text-center">
+                <img 
+                  src={initialValues.visiting_card} 
+                  alt="Visiting Card" 
+                  className="img-fluid" 
+                  style={{ maxHeight: '200px' }}
+                />
+                <div className="mt-2 small text-muted">Visiting Card</div>
+              </li>
+            )}
+            <li className="list-group-item d-flex justify-content-between align-items-center">
+              <label className="fs--1 mb-0">User Type</label>
+              <span className="fs--1">
+                {renderUserTypeIcon(initialValues.is_wholesaler)}
+              </span>
             </li>
             <li className="list-group-item d-flex justify-content-between align-items-center">
               <label className="fs--1 mb-0">Name</label>
               <span className="fs--1 text-muted">{initialValues.fname + ' ' + initialValues.lname}</span>
             </li>
+            {initialValues.is_wholesaler && (
+              <>
+                <li className="list-group-item d-flex justify-content-between align-items-center">
+                  <label className="fs--1 mb-0">Firm Name</label>
+                  <span className="fs--1">{initialValues.wholesaler_firmname || '-'}</span>
+                </li>
+                <li className="list-group-item d-flex justify-content-between align-items-center">
+                  <label className="fs--1 mb-0">GST Number</label>
+                  <span className="fs--1">{initialValues.gst_no || '-'}</span>
+                </li>
+              </>
+            )}
             <li className="list-group-item d-flex justify-content-between align-items-center">
               <label className="fs--1 mb-0">Email</label>
               <span className="fs--1">{initialValues.email}</span>
@@ -345,12 +438,12 @@ const ListCustomer = () => {
               <span className="fs--1 text-muted ps-3">{initialValues.phone_no}</span>
             </li>
             <li className="list-group-item d-flex justify-content-between align-items-center">
-              <label className="fs--1 mb-0">Role</label>
-              <span className="fs--1">{initialValues.roleId?.name}</span>
-            </li>
-            <li className="list-group-item d-flex justify-content-between align-items-center">
               <label className="fs--1 mb-0">Status</label>
-              <Status table="users" status={initialValues.status} data_id={initialValues._id} />
+              <Status 
+                table="users" 
+                status={initialValues.status} 
+                data_id={initialValues._id} 
+              />
             </li>
             <li className="list-group-item d-flex justify-content-between align-items-center">
               <label className="fs--1 mb-0">Created At</label>
